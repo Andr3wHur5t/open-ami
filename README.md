@@ -2,26 +2,35 @@
 
 Public versions of my hardened AMIs based on Amazon Linux.
 
-High Level threat models included for each OS.
 
 ## Images
 
-**HAWL1**: (Hardened Amazon Linux w\ Level 1 CIS Benchmark)
-- Conforms to CIS Security Amazon Linux Level 1 Security Benchmark
-- Programmatic acceptance tests to verify conformance
-- Disabled Systems (reducing attack surface):
+### HAWL1:
+
+**Sumery:** Hardened Amazon Linux With Level 1 CIS Benchmark (HA W L1)
+
+**Use Case:** Base image for better hardened applications
+
+**Key Fratures:**
+
+- Programmatic acceptance tests to verify conformance with CIS level 1
+- Designed For Defense in Depth
+- AIDE: Host file system integrity based incursion detection system
+
+**Important Notes:**
+- Disabled Systems:
   - IPv6
   - Disk Swapping
   - X11 Window Server
-- Host Based Incursion Detection:
-  - AIDE FilesSystem Modification monitoring and reporting
-- TODO:
-  - BSD Jails
-  - BRO IDE
-  - OSQuery
-  - SELinux
-  - Centralized Logging via AntMan
-  - Auto Configuration Scripts
+
+**Whishlist:**
+- Centralized Logging via AntMan
+- BSD Jails
+- Bro IDE
+- OSQuery
+- SELinux
+- Auto Configuration Scripts
+- Read Only File System
 
 > **WARNING:**
 >
@@ -29,14 +38,26 @@ High Level threat models included for each OS.
 >
 > HAWL1 is intended as a base image only; It is your responsibility to understand what hardening is required to handle your use case and threats.
 
-**HAWL1 Bastion:** (HAWL1 based Jump box)
-- Only Offers Tunneling Capability
+### HAWL1 Bastion
+
+**Sumery:** HAWL1 based SSH & TCP bastion jumpbox.
+
+**Use Case:** Enable authenticated access to private networks.
+
+**Key Features:**
+
+- Allows tunneling exclusively
 - Baked Backup Keys
 - CA Based SSH Access
 
-**HAWL1 Vault:** (HAWL1 based Hashicorp Vault)
-- Managed Vault Damon
-- Reports Unseal Status to CloudWatch Metrics
-- Only Exposes API
-- Uses Dynamo DB as a HA backend
+### HAWL1 Vault
+
+**Summery:** Hashicorp vault running on HAWL1
+
+**Key Features:**
+- Unprivileged Vault Server Managed By Damon
+- Dynamodb based HA vault storage
+- Unseal Status Reported to CloudWatch
+- Only exposes Vault HTTPS api
+- Cert Sync Over Encrypted S3
 
