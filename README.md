@@ -8,6 +8,37 @@ Public versions of my hardened AMIs based on Amazon Linux.
 >
 > Additional hardening and detection systems are advised when using these images.
 
+### HAWL1 Vault
+
+**Summery:** [Hashicorp vault](https://www.vaultproject.io/) running on HAWL1
+
+**Usage:** Central secret management solution.
+
+**Key Features:**
+- Unprivileged Vault Server Managed By Damon
+- [Dynamodb based](https://www.vaultproject.io/docs/configuration/storage/dynamodb.html) HA secret storage backend
+- Unseal Status Reported to CloudWatch via custom metrics
+- Only exposes Vault HTTPS API
+- Cert & Key Sync Over Encrypted S3
+
+### HAWL1 Bastion
+
+**Sumery:** HAWL1 based SSH & TCP bastion jumpbox.
+
+**Use Case:**
+- Authenticated [access to private networks](https://cloudacademy.com/blog/aws-bastion-host-nat-instances-vpc-peering-security/).
+- [Routing traffic](https://github.com/darkk/redsocks) around restricted networks
+- Accessing publicly inaccessible services and dashboards
+
+**Key Features:**
+
+- Allows tunneling exclusively
+- Baked Backup Keys
+  - Good for emergency access (Primary Authentication Server down, but it's in the secured network)
+  - Useful for unsealing a vault in a private network (Use TCP proxy to perform unseal operations over TLS)
+- CA Based SSH Access
+  - Can be [used with hashicorp vault](https://www.vaultproject.io/docs/secrets/ssh/signed-ssh-certificates.html) to provide short lived access
+  - Can use [smart cards via OpenSSH PKCS#11](https://github.com/OpenSC/OpenSC/wiki/OpenSSH-and-smart-cards-PKCS%2311) integration
 
 ### HAWL1:
 
@@ -40,36 +71,4 @@ Public versions of my hardened AMIs based on Amazon Linux.
 > **NOTE:**
 >
 > HAWL1 is intended as a base image only; It is your responsibility to understand what hardening is required to handle your use case and threats.
-
-### HAWL1 Bastion
-
-**Sumery:** HAWL1 based SSH & TCP bastion jumpbox.
-
-**Use Case:**
-- Authenticated [access to private networks](https://cloudacademy.com/blog/aws-bastion-host-nat-instances-vpc-peering-security/).
-- [Routing traffic](https://github.com/darkk/redsocks) around restricted networks
-- Accessing publicly inaccessible services and dashboards
-
-**Key Features:**
-
-- Allows tunneling exclusively
-- Baked Backup Keys
-  - Good for emergency access (Primary Authentication Server down, but it's in the secured network)
-  - Useful for unsealing a vault in a private network (Use TCP proxy to perform unseal operations over TLS)
-- CA Based SSH Access
-  - Can be [used with hashicorp vault](https://www.vaultproject.io/docs/secrets/ssh/signed-ssh-certificates.html) to provide short lived access
-  - Can use [smart cards via OpenSSH PKCS#11](https://github.com/OpenSC/OpenSC/wiki/OpenSSH-and-smart-cards-PKCS%2311) integration
-
-### HAWL1 Vault
-
-**Summery:** [Hashicorp vault](https://www.vaultproject.io/) running on HAWL1
-
-**Usage:** Central secret management solution.
-
-**Key Features:**
-- Unprivileged Vault Server Managed By Damon
-- [Dynamodb based](https://www.vaultproject.io/docs/configuration/storage/dynamodb.html) HA secret storage backend
-- Unseal Status Reported to CloudWatch via custom metrics
-- Only exposes Vault HTTPS API
-- Cert & Key Sync Over Encrypted S3
 
