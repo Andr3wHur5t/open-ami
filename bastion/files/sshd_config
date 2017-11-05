@@ -1,0 +1,109 @@
+#	$OpenBSD: sshd_config,v 1.100 2016/08/15 12:32:04 naddy Exp $
+
+# This is the sshd server system-wide configuration file.  See
+# sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/local/bin:/bin:/usr/bin
+
+# The strategy used for options in the default sshd_config shipped with
+# OpenSSH is to specify options with their default value where
+# possible, but leave them commented.  Uncommented options override the
+# default value.
+
+# If you want to change the port on a SELinux system, you have to tell
+# SELinux about this change.
+# semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
+#
+#Port 22
+
+# WARNING: 'UsePAM no' is not supported in Amazon Linux AMI and may cause several problems.
+UsePAM yes
+
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+HostKey /etc/ssh/ssh_host_ed25519_key
+
+# logging -- will be sent to central logging
+SyslogFacility AUTHPRIV
+LogLevel INFO
+
+#### Authentication:
+Protocol 2
+
+# Display our warning message to attackers and visitors
+Banner /etc/issue.net
+PrintMotd yes
+PrintLastLog yes
+
+# No Direct Root Access; must use sudo -- better for audit trail
+PermitRootLogin no
+
+# This makes an attacker wait 1min between every failed auth attempt; reduces chance of brute force.
+LoginGraceTime 60
+
+# Max tries per connection; mitigate brute force
+MaxAuthTries 4
+
+# Force the client to disconnect after idle for 300 seconds with 0 itterations
+ClientAliveInterval 300
+ClientAliveCountMax 0
+
+# Passwords are too weak force asymmetric key usage; force disable passwords.
+PasswordAuthentication no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+
+# The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
+# but this is overridden so installations will only check .ssh/authorized_keys
+AuthorizedKeysFile .ssh/authorized_keys
+
+# This option can allow an attacker to inject a Trojan via PATH; disable for our protection.
+PermitUserEnvironment no
+
+# Only support strong crypto
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-256,hmac-sha2-512,umac-128@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+KexAlgorithms curve25519-sha256@libssh.org,diffie-hellman-group-exchange-sha256,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521
+
+# Compression and encryption don't normally play well with each other
+Compression no
+
+# Have the user verify authentication to hosts; be strict about keys.
+StrictModes yes
+PubkeyAuthentication yes
+HostbasedAuthentication no
+IgnoreRhosts yes
+
+# Set this to 1 to disabled multiplexing connections
+MaxSessions 10
+# Ensure session stickiness is off
+UseLogin no
+# Use Kernel Privilege separation
+UsePrivilegeSeparation sandbox
+
+# We don't use X11 apps typically so keep this disabled
+X11Forwarding no
+
+# Disable tunneling in the network; explicitly enable this if this is a jump box.
+AllowTcpForwarding no
+AllowStreamLocalForwarding no
+GatewayPorts no
+
+# Allow interactive sessions; no tunnels to further hosts
+PermitTunnel no
+PermitTTY yes
+
+# Sends a empty TCP packet to keep the connection alive; can be blocked by firewalls no real assurance.
+TCPKeepAlive yes
+# This option performs a reverse DNS lookup on the client; can get ISP otherwise useless.
+UseDNS no
+
+# Accept locale-related environment variables
+AcceptEnv LANG LC_CTYPE LC_NUMERIC LC_TIME LC_COLLATE LC_MONETARY LC_MESSAGES
+AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
+AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
+AcceptEnv XMODIFIERS
+
+# override default of no subsystems
+Subsystem sftp	/usr/libexec/openssh/sftp-server
+

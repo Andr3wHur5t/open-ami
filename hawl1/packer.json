@@ -6,7 +6,7 @@
     "source_ami": "ami-6df1e514",
     "instance_type": "m3.medium",
     "ssh_username": "ec2-user",
-    "ami_name": "HAWL1-{{isotime \"2006-01-02\"}}"
+    "ami_name": "HAWL1-{{isotime \"2006-01-02_15\"}}"
   }],
   "provisioners": [{
     "type": "shell",
