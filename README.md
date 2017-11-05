@@ -25,11 +25,9 @@ High Level threat models included for each OS.
 
 > **WARNING:**
 >
-> It is your responsibility to understand what hardening is required to handle your use case and threats.
->
 > This image is designed to provide a starting point to reduce reproduction of work and promote public review.
 >
-> HAWL1 is intended as a base image only; additional work should be done to fit your use case and threat models.
+> HAWL1 is intended as a base image only; It is your responsibility to understand what hardening is required to handle your use case and threats.
 
 **HAWL1 Bastion:** (HAWL1 based Jump box)
 - Only Offers Tunneling Capability
