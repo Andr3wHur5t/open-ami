@@ -1,0 +1,9 @@
+{
+  "cloudwatch.emitMetrics": true,
+  "flows": [
+    {
+      "filePattern": "/var/log/*",
+      "deliveryStream": "logs.system"
+    }
+  ]
+}

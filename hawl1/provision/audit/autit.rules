@@ -1,0 +1,83 @@
+# This file contains the auditctl rules that are loaded
+# whenever the audit daemon is started via the initscripts.
+# The rules are simply the parameters that would be passed
+# to auditctl.
+
+# First rule - delete all
+-D
+
+# Increase the buffers to survive stress events.
+# Make this bigger for busy systems
+-b 320
+
+# Disable system call auditing.
+# Remove the following line if you need the auditing.
+-a never,task
+
+# Make audit rules immutable
+-e 2
+
+# Feel free to add below this line. See auditctl man page
+
+# Capture Time Changes
+-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change
+-a always,exit -F arch=b32 -S clock_settime -k time-change
+-w /etc/localtime -p wa -k time-change
+
+# Capture Group Changes
+-w /etc/group -p wa -k identity
+-w /etc/passwd -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/security/opasswd -p wa -k identity
+
+# Capture environment changes
+-a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale
+-w /etc/issue -p wa -k system-locale
+-w /etc/issue.net -p wa -k system-locale
+-w /etc/hosts -p wa -k system-locale
+-w /etc/sysconfig/network -p wa -k system-locale
+
+# Capture Logins
+-w /var/log/lastlog -p wa -k logins
+-w /var/run/faillock/ -p wa -k logins
+
+# Capture Session Info
+-w /var/run/utmp -p wa -k session
+-w /var/log/wtmp -p wa -k session
+-w /var/log/btmp -p wa -k session
+
+# File Permission Modifications
+-a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat -F auid>=500 -F
+auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b32 -S chown -S fchown -S fchownat -S lchown -F auid>=500 -F
+auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b32 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S
+lremovexattr -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod
+
+# Failed Auth Attempts
+-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F
+exit=-EACCES -F auid>=500 -F auid!=4294967295 -k access
+-a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F
+exit=-EPERM -F auid>=500 -F auid!=4294967295 -k access
+
+# Collect Disk Mount Info
+-a always,exit -F arch=b32 -S mount -F auid>=500 -F auid!=4294967295 -k mounts
+
+# Collect File Deletions
+ -a always,exit -F arch=b32 -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F
+auid!=4294967295 -k delete
+
+# Collect Changes To People Who Can Become sudo
+-w /etc/sudoers -p wa -k scope
+-w /etc/sudoers.d -p wa -k scope
+
+# Collect Sudo Log
+-w /var/log/sudo.log -p wa -k actions
+
+# Collection kernel Module Mounts
+-w /sbin/insmod -p x -k modules
+-w /sbin/rmmod -p x -k modules
+-w /sbin/modprobe -p x -k modules
+-a always,exit arch=b32 -S init_module -S delete_module -k modules
+

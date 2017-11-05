@@ -1,0 +1,8 @@
+# System Files
+.DS_Store
+*.log
+
+# IDE Files
+.idea
+*.swp
+*.swo
