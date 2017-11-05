@@ -1,5 +1,18 @@
 # Bastion
 
+The first line of defense to a private network.
+
+Mount a static `localhost:port` to bastion `targetAddr:port`:
+
+```sh
+
+```
+
+Connect to the bastion using your browser via a dynamic tunnel (SOCKS5):
+
+```sh
+```
+
 ## Core Mitigations
 
 - Short Lived Access whenever possible (CA sign public key with short ttl)
@@ -35,6 +48,17 @@
     - No bypassing this rule through instance spawn
     - Safe by default when not spawned with cloud-init
 - Offload administrative work to signing process
+  - Reasons:
+    - Centralizing this process allows admins to spend time focusing on critical procedures
+    - Makes it easier to manage this system at scale
+
+
+
+**Aditional Mitigations:**
+- Remove cloud-init and bake CA and/or emergency access keys
+  - Reasons:
+    - When used in combination with AMI launch restrictions can reduce impact of lost aws creds
+    - Cant override system configuration
 
 ## High Level Threats
 
