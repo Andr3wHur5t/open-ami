@@ -2,8 +2,12 @@
 
 Public versions of my hardened AMIs based on Amazon Linux.
 
+> **Warning:**
+>
+> This project is designed to provide a starting point to reduce reproduction of work and promote public review.
+>
+> Additional hardening and detection systems are advised when using these images.
 
-## Images
 
 ### HAWL1:
 
@@ -32,9 +36,7 @@ Public versions of my hardened AMIs based on Amazon Linux.
 - Auto Configuration Scripts
 - Read Only File System
 
-> **WARNING:**
->
-> This image is designed to provide a starting point to reduce reproduction of work and promote public review.
+> **NOTE:**
 >
 > HAWL1 is intended as a base image only; It is your responsibility to understand what hardening is required to handle your use case and threats.
 
