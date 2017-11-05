@@ -24,6 +24,7 @@ High Level threat models included for each OS.
   - Auto Configuration Scripts
 
 > **WARNING:**
+>
 > It is your responsibility to understand what hardening is required to handle your use case and threats.
 >
 > This image is designed to provide a starting point to reduce reproduction of work and promote public review.
