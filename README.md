@@ -55,7 +55,7 @@ Public versions of my hardened AMIs based on Amazon Linux.
   - Useful for unsealing a vault in a private network
 - CA Based SSH Access
   - Can be [used with hashicorp vault](https://www.vaultproject.io/docs/secrets/ssh/signed-ssh-certificates.html) to provide short lived access
-  - Can use smart cards via OpenSSH PKCS#11 integration
+  - Can use [smart cards via OpenSSH PKCS#11](https://github.com/OpenSC/OpenSC/wiki/OpenSSH-and-smart-cards-PKCS%2311) integration
 
 ### HAWL1 Vault
 
