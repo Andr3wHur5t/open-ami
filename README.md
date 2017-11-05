@@ -1,12 +1,12 @@
-# Open-AMI
-
-Public versions of my hardened AMIs based on Amazon Linux.
-
 > **Warning:**
 >
 > This project is designed to provide a starting point to reduce reproduction of work and promote public review.
 >
 > Additional hardening and detection systems are advised when using these images.
+
+# Open-AMI
+
+Public versions of my hardened AMIs based on Amazon Linux.
 
 ### HAWL1 Vault
 
