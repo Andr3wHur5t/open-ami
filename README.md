@@ -45,7 +45,10 @@ Public versions of my hardened AMIs based on Amazon Linux.
 
 **Sumery:** HAWL1 based SSH & TCP bastion jumpbox.
 
-**Use Case:** Authenticated access to private networks.
+**Use Case:**
+- Authenticated access to private networks.
+- Routing traffic around restricted networks
+- Accessing publicly inaccessible services and dashboards
 
 **Key Features:**
 
