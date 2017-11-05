@@ -11,15 +11,16 @@ Public versions of my hardened AMIs based on Amazon Linux.
 
 ### HAWL1:
 
-**Sumery:** Hardened Amazon Linux With Level 1 CIS Benchmark (HA W L1)
+**Sumery:** Hardened Amazon Linux With [Level 1 CIS Benchmark](https://www.cisecurity.org/cis-benchmarks/) (HA W L1)
 
 **Use Case:** Base image for better hardened applications
 
 **Key Fratures:**
 
-- Programmatic acceptance tests to verify conformance with CIS level 1
-- Designed For Defense in Depth
-- AIDE: Host file system integrity based incursion detection system
+- Programmatic [acceptance tests](https://github.com/Andr3wHur5t/open-ami/blob/master/hawl1/validate.sh) to verify conformance with CIS level 1
+- Works well with [amazon inspector](http://docs.aws.amazon.com/inspector/latest/userguide/inspector_cis.html)
+- Designed to work with [Defense in Depth](https://en.wikipedia.org/wiki/Defense_in_depth_(computing))
+- [AIDE](http://aide.sourceforge.net/): Host file system integrity based incursion detection system
 
 **Important Notes:**
 - Disabled Systems:
@@ -44,22 +45,28 @@ Public versions of my hardened AMIs based on Amazon Linux.
 
 **Sumery:** HAWL1 based SSH & TCP bastion jumpbox.
 
-**Use Case:** Enable authenticated access to private networks.
+**Use Case:** Authenticated access to private networks.
 
 **Key Features:**
 
 - Allows tunneling exclusively
 - Baked Backup Keys
+  - Good for emergency access
+  - Useful for unsealing a vault in a private network
 - CA Based SSH Access
+  - Can be used with [hashicorp vault](https://www.vaultproject.io/docs/secrets/ssh/signed-ssh-certificates.html) to provide short lived access
+  - Can use smart cards via OpenSSH PKCS#11 integration
 
 ### HAWL1 Vault
 
-**Summery:** Hashicorp vault running on HAWL1
+**Summery:** [Hashicorp vault](https://www.vaultproject.io/) running on HAWL1
+
+**Usage:** Central secret management solution.
 
 **Key Features:**
 - Unprivileged Vault Server Managed By Damon
-- Dynamodb based HA vault storage
-- Unseal Status Reported to CloudWatch
-- Only exposes Vault HTTPS api
-- Cert Sync Over Encrypted S3
+- [Dynamodb based](https://www.vaultproject.io/docs/configuration/storage/dynamodb.html) HA secret storage backend
+- Unseal Status Reported to CloudWatch via custom metrics
+- Only exposes Vault HTTPS API
+- Cert & Key Sync Over Encrypted S3
 
