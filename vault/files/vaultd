@@ -19,6 +19,7 @@
 
 VAULT_BIN=/usr/bin/vault
 VAULT_CONF=/etc/init/vault.conf
+VAULT_CLUSTER_ADDR="$(hostname).ec2.internal"
 
 start() {
     $VAULT_BIN server -config $VAULT_CONF 2>&1 >> /var/log/vault.log&
