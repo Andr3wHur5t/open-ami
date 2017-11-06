@@ -1,0 +1,79 @@
+#
+#       Daemon for vault
+#
+# chkconfig:   345 99 20
+# description: Daemon for vault
+# processname: vault
+
+### BEGIN INIT INFO
+# Provides:       vault
+# Required-Start: $network
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start: 3 4 5
+# Default-Stop:  0 1 6
+# Short-Description: start and stop vault
+# Description: Daemon for vault
+### END INIT INFO
+
+VAULT_BIN=/usr/bin/vault
+VAULT_CONF=/etc/init/vault.conf
+
+start() {
+    $VAULT_BIN server -config $VAULT_CONF 2>&1 >> /var/log/vault.log&
+    return $?
+}
+
+stop() {
+    # Seal the vault before stopping
+    $VAULT_BIN seal -address=http://$(cat $VAULT_CONF |awk '/address/ {x=$3} END {print x}'|sed 's/"//g')
+    # Get the process number and kill the process
+    kill -9 $(ps -C vault|awk 'END {print $1}')
+    return $?
+}
+
+status() {
+    if [ -z $(ps -C vault|awk 'END {print $1}'|grep -v PID) ]; then
+        echo "Vault is not running."
+        return 3
+    else
+        $VAULT_BIN status -address=http://$(cat $VAULT_CONF |awk '/address/ {x=$3} END {print x}'|sed 's/"//g')
+    fi
+    return 0
+}
+
+seal () {
+    if [ -z $(ps -C vault|awk 'END {print $1}'|grep -v PID) ]; then
+        echo "Vault is not running."
+        return 3
+    else
+        $VAULT_BIN seal
+        return $?
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        RETVAL=$?
+        ;;
+    stop)
+        stop
+        RETVAL=$?
+        ;;
+    status)
+        status
+        RETVAL=$?
+        ;;
+    seal)
+        seal
+        RETVAL=$?
+        ;;
+    *)
+        echo $"Usage: vault {start|stop|status|seal}"
+        RETVAL=2
+        ;;
+esac
+
+exit $RETVAL
