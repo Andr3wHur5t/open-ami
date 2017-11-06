@@ -23,6 +23,29 @@ HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_ecdsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
 
+### JUMP BOX RELATED CONFIG ###
+
+# Allow Sending to remote hosts only
+AllowTcpForwarding yes
+PermitTunnel no
+
+# We don't want to allow potentially insecure connections in the event this box is compromised
+X11Forwarding no
+# No unix sockets allowed
+AllowStreamLocalForwarding no
+# Don't let the private network talk back to us
+GatewayPorts no
+
+# We dont want people to make changes to this server; so disable tty and sftp
+# NOTE: Change this to enable tty for debug
+PermitTTY no
+Subsystem sftp	/usr/libexec/openssh/sftp-server
+
+# Only Allow Our prox User
+AllowUsers prox, emergency
+
+
+### Hardened Defaults ###
 # logging -- will be sent to central logging
 SyslogFacility AUTHPRIV
 LogLevel INFO
@@ -33,7 +56,7 @@ Protocol 2
 # Display our warning message to attackers and visitors
 Banner /etc/issue.net
 PrintMotd yes
-PrintLastLog yes
+PrintLastLog no
 
 # No Direct Root Access; must use sudo -- better for audit trail
 PermitRootLogin no
@@ -74,24 +97,8 @@ PubkeyAuthentication yes
 HostbasedAuthentication no
 IgnoreRhosts yes
 
-# Set this to 1 to disabled multiplexing connections
-MaxSessions 10
-# Ensure session stickiness is off
-UseLogin no
 # Use Kernel Privilege separation
 UsePrivilegeSeparation sandbox
-
-# We don't use X11 apps typically so keep this disabled
-X11Forwarding no
-
-# Disable tunneling in the network; explicitly enable this if this is a jump box.
-AllowTcpForwarding no
-AllowStreamLocalForwarding no
-GatewayPorts no
-
-# Allow interactive sessions; no tunnels to further hosts
-PermitTunnel no
-PermitTTY yes
 
 # Sends a empty TCP packet to keep the connection alive; can be blocked by firewalls no real assurance.
 TCPKeepAlive yes
@@ -104,6 +111,4 @@ AcceptEnv LC_PAPER LC_NAME LC_ADDRESS LC_TELEPHONE LC_MEASUREMENT
 AcceptEnv LC_IDENTIFICATION LC_ALL LANGUAGE
 AcceptEnv XMODIFIERS
 
-# override default of no subsystems
-Subsystem sftp	/usr/libexec/openssh/sftp-server
 

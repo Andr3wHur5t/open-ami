@@ -6,10 +6,23 @@
     "source_ami": "ami-ad895cd5",
     "instance_type": "m3.medium",
     "ssh_username": "ec2-user",
-    "ami_name": "HAWL1-Bastion-{{isotime \"2006-01-02:15\"}}"
+    "ami_name": "HAWL1-Bastion-{{isotime \"2006-01-02_15\"}}"
   }],
   "provisioners": [{
     "type": "shell",
-    "script": "prepare.sh"
+    "script": "firewall.sh"
+  },{
+    "type": "shell",
+    "inline": ["mkdir /tmp/files"]
+  },{
+    "type": "file",
+    "source": "./files",
+    "destination": "/tmp/"
+  },{
+    "type": "shell",
+    "script": "configure.sh"
+  },{
+    "type": "shell",
+    "script": "validate.sh"
   }]
 }

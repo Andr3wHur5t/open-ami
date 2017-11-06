@@ -62,6 +62,7 @@ Public versions of my hardened AMIs based on Amazon Linux.
 **Whishlist:**
 - Centralized Logging via AntMan
 - BSD Jails
+- Snort
 - Bro IDE
 - OSQuery
 - SELinux
