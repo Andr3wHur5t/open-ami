@@ -22,7 +22,7 @@ echo "-- Configuring Access User"
 useradd prox -mUc 'TCP Proxy User'
 mkdir '/home/prox/.ssh/'
 # Block Usage of authorized keys for prox user; all authentication will come through CA certs
-touch /home/prox/.ssh/authorizedKeys
+touch /home/prox/.ssh/authorized_keys
 chattr +i /home/emergency/.ssh/authorized_keys
 
 echo "-- Block access to ec2-user keys"

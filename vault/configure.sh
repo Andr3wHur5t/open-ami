@@ -16,7 +16,20 @@ mv ./vault /usr/bin
 echo "-- Setting bin permissions"
 chown root:root /usr/bin/vault
 chmod 555 /usr/bin/vault
+
+# Allow for vault to use mlock without root
+sudo setcap cap_ipc_lock=+ep $(readlink -f $(which vault))
+
+# Make Vault Immutable
 chattr +i /usr/bin/vault
+
+echo "-- Making Vault User & Deny SSH"
+useradd vault -mUc 'Vault Runtime User'
+mkdir '/home/vault/.ssh/'
+chown root:root  '/home/vault/.ssh/'
+chmod 000  '/home/vault/.ssh/'
+touch '/home/vault/.ssh/authorized_keys'
+chattr +i '/home/vault/.ssh/' '/home/vault/.ssh/authorized_keys'
 
 echo "-- Installing Damon"
 mv /tmp/files/vaultd /etc/init.d/vaultd
@@ -36,6 +49,6 @@ iptables -A INPUT -p tcp --dport 8200 -m state --state NEW,ESTABLISHED -j ACCEPT
 iptables -A OUTPUT -p tcp --sport 8200 -m state --state ESTABLISHED -j ACCEPT
 service iptables save
 
-echo "-- Disable SSH"
+echo "-- Disable SSH on reboot"
 
-
+# TODO: Auto CP Cert into image on boot

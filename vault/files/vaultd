@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 #       Daemon for vault
 #
@@ -17,64 +18,129 @@
 # Description: Daemon for vault
 ### END INIT INFO
 
-VAULT_BIN=/usr/bin/vault
+PROG=vault
+USER=vault
+VAULT_BIN=/usr/bin/$PROG
 VAULT_CONF=/etc/init/vault.conf
-VAULT_CLUSTER_ADDR="$(hostname).ec2.internal"
+LOCKFILE=/var/lock/subsys/$PROG
+DAEMON_HOME="/home/$USER/"
+OPTIONS="server -config $VAULT_CONF"
+
+VAULT_CLUSTER_ADDR="https://$(hostname).ec2.internal:8200"
+VAULT_REDIRECT_ADDR="https://vault.andr3whur5t.io:8200"
+
+. /etc/init.d/functions
+
+vaultAddr() {
+  echo "http://$(cat $VAULT_CONF |awk '/address/ {x=$3} END {print x}'|sed 's/"//g')"
+}
+
+vaultPID() {
+  echo "`ps -C vault|awk 'END {print $1}'|grep -v PID`"
+}
 
 start() {
-    $VAULT_BIN server -config $VAULT_CONF 2>&1 >> /var/log/vault.log&
-    return $?
+  if [ -f "$LOCKFILE" ]; then
+    action $"Starting $PROG: (Locked) " /bin/true
+    return 0
+  fi
+  # Run as non root user; this prevents memory retrieval if vault is pwned
+  sudo -i -u $USER VAULT_REDIRECT_ADDR="$VAULT_REDIRECT_ADDR" VAULT_CLUSTER_ADDR="$VAULT_CLUSTER_ADDR"  \
+	  $VAULT_BIN server -config $VAULT_CONF 2>&1 >> /var/log/vault.log&
+
+  RETVAL=$?
+  if [ $RETVAL -eq 0 ]; then
+	  touch $LOCKFILE
+	  action $"Starting $PROG: " /bin/true
+  else
+	  action $"Starting $PROG: " /bin/false
+  fi
+  return $RETVAL
 }
 
 stop() {
-    # Seal the vault before stopping
-    $VAULT_BIN seal -address=http://$(cat $VAULT_CONF |awk '/address/ {x=$3} END {print x}'|sed 's/"//g')
-    # Get the process number and kill the process
-    kill -9 $(ps -C vault|awk 'END {print $1}')
-    return $?
+  PID="`vaultPID`"
+  if [ -z "$PID" ]; then
+    # not running; per LSB standards this is "ok"
+    action $"Stopping $PROG: (Already Stopped) " /bin/true
+    return 0
+  fi
+
+
+  if [ -n "$PID" ]; then
+    # Seal The Instance To ensure data is protected
+    $VAULT_BIN seal -address=`vaultAddr`
+    SEAL_RETVAL=$?
+    if [ $SEAL_RETVAL -ne 0 ]; then
+      RETVAL=1
+      action $"Sealing $PROG: " /bin/false
+    else
+      action $"Sealing $PROG: " /bin/true
+    fi
+
+    # Kill The Instance
+    /bin/kill "$PID" >/dev/null 2>&1
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ]; then
+        RETVAL=1
+        action $"Stopping $PROG: " /bin/false
+    else
+        action $"Stopping $PROG: " /bin/true
+    fi
+  else
+    # failed to read pidfile
+    action $"Stopping $PROG: " /bin/false
+    RETVAL=4
+  fi
+  [ $RETVAL -eq 0 ] && rm -f $LOCKFILE
+  return $RETVAL
+
 }
 
 status() {
-    if [ -z $(ps -C vault|awk 'END {print $1}'|grep -v PID) ]; then
-        echo "Vault is not running."
-        return 3
-    else
-        $VAULT_BIN status -address=http://$(cat $VAULT_CONF |awk '/address/ {x=$3} END {print x}'|sed 's/"//g')
-    fi
-    return 0
+  if [ -z "`vaultPID`" ]; then
+    echo "Vault is not running."
+    return 3
+  else
+    $VAULT_BIN status -address=`vaultAddr`
+  fi
+  return 0
 }
 
 seal () {
-    if [ -z $(ps -C vault|awk 'END {print $1}'|grep -v PID) ]; then
-        echo "Vault is not running."
-        return 3
-    else
-        $VAULT_BIN seal
-        return $?
-    fi
+  if [ -z "`vaultPID`" ]; then
+    echo "Vault is not running."
+    return 3
+  else
+    $VAULT_BIN seal -address=`vaultAddr`
+RETVAL=$?
+    action $"Sealing $PROG: " [ $RETVAL -eq 0 ]
+    return $RETVAL
+  fi
 }
 
 case "$1" in
-    start)
-        start
-        RETVAL=$?
-        ;;
-    stop)
-        stop
-        RETVAL=$?
-        ;;
-    status)
-        status
-        RETVAL=$?
-        ;;
-    seal)
-        seal
-        RETVAL=$?
-        ;;
-    *)
-        echo $"Usage: vault {start|stop|status|seal}"
-        RETVAL=2
-        ;;
+  start)
+    # Ensure we run with vault user; this limits exposure when vault is pwned
+    start
+    RETVAL=$?
+    ;;
+  stop)
+    stop
+    RETVAL=$?
+    ;;
+  status)
+    status
+    RETVAL=$?
+    ;;
+  seal)
+    seal
+    RETVAL=$?
+    ;;
+  *)
+    echo $"Usage: vault {start|stop|status|seal}"
+    RETVAL=2
+    ;;
 esac
 
 exit $RETVAL
