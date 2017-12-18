@@ -46,9 +46,11 @@ chkconfig --add vaultd
 
 echo "-- Allow vault traffic in IP tables"
 iptables -A INPUT -p tcp --dport 8200 -m state --state NEW,ESTABLISHED -j ACCEPT
-iptables -A OUTPUT -p tcp --sport 8200 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 8200 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp --dport 8201 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp --sport 8201 -m state --state NEW,ESTABLISHED -j ACCEPT
 service iptables save
 
 echo "-- Disable SSH on reboot"
-
+# chkconfig off sshd
 # TODO: Auto CP Cert into image on boot

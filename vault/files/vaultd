@@ -27,7 +27,15 @@ DAEMON_HOME="/home/$USER/"
 OPTIONS="server -config $VAULT_CONF"
 
 VAULT_CLUSTER_ADDR="https://$(hostname).ec2.internal:8200"
-VAULT_REDIRECT_ADDR="https://vault.andr3whur5t.io:8200"
+
+get_arg() {
+  CONFIG_FILE="/home/vault/conf"
+  echo "$(grep "$1=" "$CONFIG_FILE" | cut -d '=' -f2-)";
+}
+
+VAULT_REDIRECT_ADDR=`get_arg VAULT_REDIRECT_ADDR`
+AWS_DEFAULT_REGION=`get_arg AWS_DEFAULT_REGION`
+AWS_DYNAMODB_TABLE=`get_arg AWS_DYNAMODB_TABLE`
 
 . /etc/init.d/functions
 
@@ -45,7 +53,8 @@ start() {
     return 0
   fi
   # Run as non root user; this prevents memory retrieval if vault is pwned
-  sudo -i -u $USER VAULT_REDIRECT_ADDR="$VAULT_REDIRECT_ADDR" VAULT_CLUSTER_ADDR="$VAULT_CLUSTER_ADDR"  \
+  sudo -i -u $USER AWS_DEFAULT_REGION="$AWS_DEFAULT_REGION" AWS_DYNAMODB_TABLE="$AWS_DYNAMODB_TABLE"\
+    VAULT_REDIRECT_ADDR="$VAULT_REDIRECT_ADDR" VAULT_CLUSTER_ADDR="$VAULT_CLUSTER_ADDR"  \
 	  $VAULT_BIN server -config $VAULT_CONF 2>&1 >> /var/log/vault.log&
 
   RETVAL=$?
